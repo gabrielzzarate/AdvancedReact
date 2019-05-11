@@ -64,11 +64,12 @@ const Header = () => (
 				</Link>
 			</Logo>
 		</div>
+		<Nav />
 		<div className="sub-bar">
 			<p>Search</p>
 		</div>
 		<div>Cart</div>
-		<Nav />
+		
 	</StyledHeader>
 )
 
