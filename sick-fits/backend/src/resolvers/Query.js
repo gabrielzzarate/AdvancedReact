@@ -6,6 +6,7 @@ if the query matches whats on the server exactly, and you don't need to do any o
 
 const Query = {
   items: forwardTo('db'),
+  item: forwardTo('db'),
 };
 
 // const Query = {
