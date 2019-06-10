@@ -10,7 +10,7 @@ const SINGLE_ITEM_QUERY = gql`
   query SINGLE_ITEM_QUERY($id: ID!) {
     item(where: { id: $id }) {
       id
-      item
+      title
       description
       price
     }
@@ -19,32 +19,39 @@ const SINGLE_ITEM_QUERY = gql`
 
 const UPDATE_ITEM_MUTATION = gql`
   mutation UPDATE_ITEM_MUTATION(
-    $title: String!
-    $description: String!
-    $price: Int!
-    $image: String
-    $largeImage: String
+    $id: ID!
+    $title: String
+    $description: String
+    $price: Int
   ) {
-    createItem(
+    updateItem(
+      id: $id
       title: $title
       description: $description
       price: $price
-      image: $image
-      largeImage: $largeImage
     ) {
       id
+      title
+      description
+      price
     }
   }
 `;
 
 class UpdateItem extends Component {
   state = {
-    title: '',
-    decription: '',
-    image: '',
-    largeImage: '',
-    price: 0,
   };
+
+  updateItem = async (e, updateItemMutation) => {
+    e.preventDefault();
+    console.log('updating item', this.state);
+    const res = await updateItemMutation({
+      variables: {
+        id: this.props.id,
+        ...this.state,
+      }
+    });
+  }
 
   handleChange = (e) => {
     const { name, type, value } = e.target;
@@ -54,7 +61,6 @@ class UpdateItem extends Component {
   }
 
   render() {
-    console.log('ay', this.props)
     return (
       <Query 
         query={SINGLE_ITEM_QUERY} 
@@ -64,27 +70,18 @@ class UpdateItem extends Component {
       >
         {({ data, loading, error }) => {
           if (loading) return 'Loading...';
+          if (!data.item) return <p>No Item Found for id {this.props.id}</p>
           if (error) {
             console.log('error')
             return null;
           }
 
           return (
-            <Mutation mutation={UPDATE_ITEM_MUTATION} variables={this.state}>
-              {(createItem, { loading, error }) => (
-              <Form 
-              onSubmit={async e => {
-                // stop the form from submitting
-                e.preventDefault();
-                // call the mutation
-                const res = await createItem();
-                // change them to the singe item page;
-                Router.push({
-                  pathname: '/item',
-                  query: { id: res.data.createItem.id }
-                });
-                
-              }}>
+            <Mutation 
+              mutation={UPDATE_ITEM_MUTATION} 
+            >
+              {(updateItem, { loading, error }) => (
+              <Form onSubmit={e => this.updateItem(e, updateItem)}>
                 <Error error={error} />
                 <fieldset disabled={loading} aria-busy={loading}>
                   <label htmlFor="title">
