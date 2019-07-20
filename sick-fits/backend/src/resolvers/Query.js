@@ -1,5 +1,5 @@
 const { forwardTo } = require('prisma-binding');
-
+const { hasPermission } = require('../utils');
 /* 
 if the query matches whats on the server exactly, and you don't need to do any other operations like authentication, etc, you can just forward the query on to the db prisma instance.
 */
@@ -16,14 +16,17 @@ const Query = {
       where: { id: ctx.request.userId },
     }, info);
   },
+  async users(parent, args, ctx, info) {
+    // 1. Check if they are logged in
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in!');
+    }
+    // 2. Check if the user has the permissions to query all the users
+    // ! add this back in
+    // hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE']);
+    // 2. If they do, query all the users!
+    return ctx.db.query.users({}, info);
+  }
 };
-
-// const Query = {
-//   async items(parent, args, ctx, info) {
-//     const items = ctx.db.query.items();
-
-//     return items;
-//   }
-// };
 
 module.exports = Query;
