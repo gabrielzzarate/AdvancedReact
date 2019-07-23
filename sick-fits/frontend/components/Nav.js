@@ -7,7 +7,6 @@ const Nav = () => (
     <User>
     {({ data: { me, error }}) => (
       <NavStyles>
-        {console.log("ME", me, error)}
         <Link href="/items">
           <a>Shop</a>
         </Link>
